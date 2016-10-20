@@ -11,6 +11,7 @@ import com.google.android.gms.iid.InstanceID;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -24,9 +25,10 @@ import java.security.cert.X509Certificate;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import javax.security.auth.x500.X500Principal;
-import android.security.keystore.KeyProperties;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyGenParameterSpec.Builder;
+
+import android.security.KeyPairGeneratorSpec;
+import android.security.KeyPairGeneratorSpec.Builder;
+
 import java.util.Calendar;
 
 public class RNDeviceModule extends ReactContextBaseJavaModule {
@@ -102,7 +104,6 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
     constants.put("deviceCountry", this.getCurrentCountry());
     //constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
     constants.put("uniqueId", getLNZUUID());
-    //constants.put("uniqueId", getLNZUUID();
     constants.put("systemManufacturer", Build.MANUFACTURER);
     constants.put("bundleId", packageName);
     constants.put("userAgent", System.getProperty("http.agent"));
@@ -163,19 +164,23 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         uuid = cert.getIssuerX500Principal().getName().substring(3);
       } else {
         // If not found, create certificate with CN=UUID and save in keystore under "lnz-uuid" alias
+        uuid = getUUIDfromAndroidId();
+
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
         end.add(Calendar.YEAR, 100);
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-          KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
-        uuid = getUUIDfromAndroidId();      
-        keyPairGenerator.initialize(
-          new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_SIGN)
-            .setCertificateSubject(new X500Principal("CN="+uuid))
-            .setKeyValidityStart(start.getTime())
-            .setKeyValidityEnd(end.getTime())
-            .build());
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
+        kpg.initialize(
+          new KeyPairGeneratorSpec.Builder(this.reactContext)
+            .setAlias(alias)
+            .setStartDate(start.getTime())
+            .setEndDate(end.getTime())
+            .setSerialNumber(BigInteger.valueOf(1))
+            .setSubject(new X500Principal("CN="+uuid))
+            .build()
+          );
+        KeyPair kp = kpg.generateKeyPair();
       }
     } catch (Exception e) {
       e.printStackTrace();
