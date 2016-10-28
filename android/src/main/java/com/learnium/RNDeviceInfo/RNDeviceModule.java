@@ -136,7 +136,7 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         uuid = UUID.randomUUID().toString();
       }
     }
-    return (uuid);
+    return (uuid.toUpperCase());
   }
 
   /*

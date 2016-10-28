@@ -134,14 +134,14 @@
 
 + (NSString *)randomUUID {
     if(NSClassFromString(@"NSUUID")) {
-        return [[NSUUID UUID] UUIDString];
+        return [[[NSUUID UUID] UUIDString] uppercaseString];
     }
     CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
     CFStringRef cfuuid = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
     CFRelease(uuidRef);
     NSString *uuid = [((__bridge NSString *) cfuuid) copy];
     CFRelease(cfuuid);
-    return uuid;
+    return [uuid uppercaseString];
 }
 
 @end
