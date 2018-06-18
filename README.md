@@ -4,6 +4,17 @@
 
 Device Information for [React Native](https://github.com/facebook/react-native)
 
+This is a fork of a fork.
+
+	https://github.com/rebeccahughes/react-native-device-info
+		=> 
+		https://github.com/sphynxnz/react-native-device-info
+			=> 
+			https://github.com/lotto-nz/react-native-device-info
+		
+
+It has been forked and packaged up separately to enable control over device ID's. OS and device vendors may change aspects of Device ID in the future. We generate ID's in UUID format and persist them in the device key store for Android and iOS.
+
 ## Install (This forked version)
 
 ```shell
