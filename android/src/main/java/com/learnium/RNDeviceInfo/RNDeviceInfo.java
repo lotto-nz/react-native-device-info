@@ -23,15 +23,15 @@ public class RNDeviceInfo implements ReactPackage {
     return modules;
   }
 
-  @Override
+  // Deprecated RN 0.47
   public List<Class<? extends JavaScriptModule>> createJSModules() {
-  	return Collections.emptyList();
+    return Collections.emptyList();
   }
 
   @Override
   public List<ViewManager> createViewManagers(
-                            ReactApplicationContext reactContext) {
-  	return Collections.emptyList();
+    ReactApplicationContext reactContext) {
+      return Collections.emptyList();
   }
 
 }

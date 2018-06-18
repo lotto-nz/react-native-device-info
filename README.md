@@ -4,10 +4,21 @@
 
 Device Information for [React Native](https://github.com/facebook/react-native)
 
+This is a fork of a fork.
+
+	https://github.com/rebeccahughes/react-native-device-info
+		=> 
+		https://github.com/sphynxnz/react-native-device-info
+			=> 
+			https://github.com/lotto-nz/react-native-device-info
+		
+
+It has been forked and packaged up separately to enable control over device ID's. OS and device vendors may change aspects of Device ID in the future. We generate ID's in UUID format and persist them in the device key store for Android and iOS.
+
 ## Install (This forked version)
 
 ```shell
-npm install --save https://github.com/lotto-nz/react-native-device-info
+npm install --save @lotto-nz/react-native-device-info
 ```
 
 ## Automatically link
@@ -15,15 +26,7 @@ npm install --save https://github.com/lotto-nz/react-native-device-info
 #### With React Native 0.27+
 
 ```shell
-react-native link react-native-device-info
-```
-
-#### With older versions of React Native
-
-You need [`rnpm`](https://github.com/rnpm/rnpm) (`npm install -g rnpm`)
-
-```shell
-rnpm link react-native-device-info
+react-native link @lotto-nz/react-native-device-info
 ```
 
 ## Manually link
@@ -31,7 +34,7 @@ rnpm link react-native-device-info
 ### iOS (via Cocoa Pods)
 Add the following line to your build targets in your `Podfile`
 
-`pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'`
+`pod 'RNDeviceInfo', :path => '../node_modules/@lotto-nz/react-native-device-info'`
 
 Then run `pod install`
 
@@ -40,13 +43,13 @@ Then run `pod install`
 In XCode, in the project navigator:
 - Right click _Libraries_
 - Add Files to _[your project's name]_
-- Go to `node_modules/react-native-device-info`
+- Go to `node_modules/@lotto-nz/react-native-device-info`
 - Add the `.xcodeproj` file
 
 In XCode, in the project navigator, select your project.
 - Add the `libRNDeviceInfo.a` from the _deviceinfo_ project to your project's _Build Phases ➜ Link Binary With Libraries_
 - Click `.xcodeproj` file you added before in the project navigator and go the _Build Settings_ tab. Make sure _All_ is toggled on (instead of _Basic_).
-- Look for _Header Search Paths_ and make sure it contains both `$(SRCROOT)/../react-native/React` and `$(SRCROOT)/../../React`
+- Look for _Header Search Paths_ and make sure it contains both `$(SRCROOT)/../@lotto-nz/react-native/React` and `$(SRCROOT)/../../React`
 - Mark both as recursive (should be OK by default).
 
 Run your project (Cmd+R)
