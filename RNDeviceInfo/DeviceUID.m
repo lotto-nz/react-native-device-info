@@ -17,6 +17,14 @@
 
 @synthesize uid = _uid;
 
+/*! Service namespace for ISR constants
+ */
+NSString *const StorageSecureNameSpace = @"lottonz";
+
+/*! Key for deviceID constant in ISR
+ */
+NSString *const LnzDeviceIdKey = @"lnz-uuid";
+
 #pragma mark - Public methods
 
 + (NSString *)uid {
@@ -50,6 +58,7 @@
     */
     if (!_uid) _uid = [[self class] randomUUID];
     [self save];
+    [self saveSecureStorage];
     return _uid;
 }
 
@@ -61,6 +70,14 @@
   }
   if (![DeviceUID valueForKeychainKey:_uidKey service:_uidKey]) {
     [DeviceUID setValue:_uid forKeychainKey:_uidKey inService:_uidKey];
+  }
+}
+
+/*! Persist UID in a way that can be retrieved with cordova-plugin-secure-storage-echo
+ */
+- (void)saveSecureStorage {
+  if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace]) {
+    [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace];
   }
 }
 
