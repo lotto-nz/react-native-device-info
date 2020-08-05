@@ -120,7 +120,7 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
     keychainItem[(__bridge id)kSecAttrAccessible] = (__bridge id)kSecAttrAccessibleAlways;
     keychainItem[(__bridge id)kSecAttrAccount] = key;
     keychainItem[(__bridge id)kSecAttrService] = service;
-  //  keychainItem[(__bridge id)kSecAttrAccessGroup] = accessGroup;
+    keychainItem[(__bridge id)kSecAttrAccessGroup] = accessGroup;
 
     return keychainItem;
 }
