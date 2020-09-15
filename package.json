@@ -1,12 +1,11 @@
 {
-  "name": "react-native-device-info",
+  "name": "@lotto-nz/react-native-device-info",
   "version": "1.1.0",
   "description": "Get device information using react-native",
   "main": "deviceinfo.js",
-  "typings": "./deviceinfo.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-community/react-native-device-info"
+    "url": "https://github.com/rebeccahughes/react-native-device-info"
   },
   "scripts": {
     "shipit": "np"
@@ -16,7 +15,6 @@
     "react-native",
     "ios",
     "android",
-    "windows",
     "device",
     "events",
     "cocoapod"
