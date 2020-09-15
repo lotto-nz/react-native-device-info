@@ -86,12 +86,18 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
   NSString *defaultAccessGroup = [appIdentifierPrefix stringByAppendingString:defaultAccessGroupSuffix];
 
   // Save for default access group
-   if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace accessGroup:defaultAccessGroup]) {
+  if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace accessGroup:defaultAccessGroup]) {
      [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:defaultAccessGroup];
-   }
+  }
+  else {
+     [DeviceUID updateValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:defaultAccessGroup];
+  }
   // Save for bundle access group
   if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace accessGroup:bundleAccessGroup]) {
     [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
+  }
+  else {
+     [DeviceUID updateValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
   }
 }
 
@@ -140,6 +146,22 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
     NSMutableDictionary *keychainItem = [[self class] keychainItemForKey:key service:service accessGroup:accessGroup];
     keychainItem[(__bridge id)kSecValueData] = [value dataUsingEncoding:NSUTF8StringEncoding];
     return SecItemAdd((__bridge CFDictionaryRef)keychainItem, NULL);
+}
+
+
++ (OSStatus)updateValue:(NSString *)value forKeychainKey:(NSString *)key inService:(NSString *)service withAccessGroup:(NSString *)accessGroup {
+    NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:
+                           (__bridge id)kSecClassGenericPassword, kSecClass,
+                           key, kSecAttrAccount,
+                           service, kSecAttrService,
+                           accessGroup, kSecAttrAccessGroup,
+                           nil];
+
+    NSDictionary *attributesToUpdate = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [value dataUsingEncoding:NSUTF8StringEncoding], kSecValueData,
+                                       nil];
+
+    return SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)attributesToUpdate);
 }
 
 + (NSString *)valueForKeychainKey:(NSString *)key service:(NSString *)service {

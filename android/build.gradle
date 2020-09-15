@@ -1,12 +1,18 @@
 apply plugin: 'com.android.library'
 
+def DEFAULT_COMPILE_SDK_VERSION             = 28
+def DEFAULT_BUILD_TOOLS_VERSION             = "28.0.0"
+def DEFAULT_TARGET_SDK_VERSION              = 28
+def DEFAULT_GOOGLE_PLAY_SERVICES_VERSION    = "+"
+def DEFAULT_SUPPORT_LIB_VERSION             = "28.0.0"
+
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion project.hasProperty('compileSdkVersion') ? project.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
+    buildToolsVersion project.hasProperty('buildToolsVersion') ? project.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion project.hasProperty('targetSdkVersion') ? project.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
         versionCode 2
         versionName "1.1"
         ndk {
@@ -14,11 +20,17 @@ android {
         }
     }
     lintOptions {
-       warning 'InvalidPackage'
+       warning 'InvalidPackage', 'MissingPermission'
     }
 }
 
 dependencies {
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.google.android.gms:play-services-gcm:+'
+    def googlePlayServicesVersion = project.hasProperty('googlePlayServicesVersion') ? project.googlePlayServicesVersion : DEFAULT_GOOGLE_PLAY_SERVICES_VERSION
+    def supportLibVersion = project.hasProperty('supportLibVersion') ? project.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
+
+    implementation 'com.facebook.react:react-native:+'
+    implementation "com.google.android.gms:play-services-gcm:$googlePlayServicesVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "com.android.support:support-v4:$supportLibVersion"
+    implementation "com.android.support:support-media-compat:$supportLibVersion"
 }
