@@ -25,6 +25,7 @@ NSString *const StorageSecureNameSpace = @"lottonz";
  */
 NSString *const LnzDeviceIdKey = @"lnz-uuid";
 
+
 #pragma mark - Public methods
 
 + (NSString *)uid {
@@ -76,8 +77,27 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
 /*! Persist UID in a way that can be retrieved with cordova-plugin-secure-storage-echo
  */
 - (void)saveSecureStorage {
-  if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace]) {
-    [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace];
+  NSString *appIdentifierPrefix = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"AppIdentifierPrefix"];
+
+  NSString *bundleAccessGroupSuffix = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  NSString *defaultAccessGroupSuffix = @"co.nz.mylotto";
+
+  NSString *bundleAccessGroup = [appIdentifierPrefix stringByAppendingString:bundleAccessGroupSuffix];
+  NSString *defaultAccessGroup = [appIdentifierPrefix stringByAppendingString:defaultAccessGroupSuffix];
+
+  // Save for default access group
+  if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace accessGroup:defaultAccessGroup]) {
+     [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:defaultAccessGroup];
+  }
+  else {
+     [DeviceUID updateValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:defaultAccessGroup];
+  }
+  // Save for bundle access group
+  if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace accessGroup:bundleAccessGroup]) {
+    [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
+  }
+  else {
+     [DeviceUID updateValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
   }
 }
 
@@ -96,6 +116,22 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
     return keychainItem;
 }
 
+/*! Create as generic NSDictionary to be used to query and update Keychain items. Also allow querying via Keychain access groups.
+ *  param1
+ *  param2
+ */
++ (NSMutableDictionary *)keychainItemForKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup {
+    NSMutableDictionary *keychainItem = [[NSMutableDictionary alloc] init];
+    keychainItem[(__bridge id)kSecClass] = (__bridge id)kSecClassGenericPassword;
+    keychainItem[(__bridge id)kSecAttrAccessible] = (__bridge id)kSecAttrAccessibleAlways;
+    keychainItem[(__bridge id)kSecAttrAccount] = key;
+    keychainItem[(__bridge id)kSecAttrService] = service;
+    keychainItem[(__bridge id)kSecAttrAccessGroup] = accessGroup;
+
+    return keychainItem;
+}
+
+
 /*! Sets
  *  param1
  *  param2
@@ -106,9 +142,49 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
     return SecItemAdd((__bridge CFDictionaryRef)keychainItem, NULL);
 }
 
++ (OSStatus)setValue:(NSString *)value forKeychainKey:(NSString *)key inService:(NSString *)service withAccessGroup:(NSString *)accessGroup {
+    NSMutableDictionary *keychainItem = [[self class] keychainItemForKey:key service:service accessGroup:accessGroup];
+    keychainItem[(__bridge id)kSecValueData] = [value dataUsingEncoding:NSUTF8StringEncoding];
+    return SecItemAdd((__bridge CFDictionaryRef)keychainItem, NULL);
+}
+
+
++ (OSStatus)updateValue:(NSString *)value forKeychainKey:(NSString *)key inService:(NSString *)service withAccessGroup:(NSString *)accessGroup {
+    NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:
+                           (__bridge id)kSecClassGenericPassword, kSecClass,
+                           key, kSecAttrAccount,
+                           service, kSecAttrService,
+                           accessGroup, kSecAttrAccessGroup,
+                           nil];
+
+    NSDictionary *attributesToUpdate = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [value dataUsingEncoding:NSUTF8StringEncoding], kSecValueData,
+                                       nil];
+
+    return SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)attributesToUpdate);
+}
+
 + (NSString *)valueForKeychainKey:(NSString *)key service:(NSString *)service {
     OSStatus status;
     NSMutableDictionary *keychainItem = [[self class] keychainItemForKey:key service:service];
+    keychainItem[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
+    keychainItem[(__bridge id)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
+    CFDictionaryRef result = nil;
+    status = SecItemCopyMatching((__bridge CFDictionaryRef)keychainItem, (CFTypeRef *)&result);
+    if (status != noErr) {
+        return nil;
+    }
+    NSDictionary *resultDict = (__bridge_transfer NSDictionary *)result;
+    NSData *data = resultDict[(__bridge id)kSecValueData];
+    if (!data) {
+        return nil;
+    }
+    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+}
+
++ (NSString *)valueForKeychainKey:(NSString *)key service:(NSString *)service accessGroup:(NSString *)accessGroup {
+    OSStatus status;
+    NSMutableDictionary *keychainItem = [[self class] keychainItemForKey:key service:service accessGroup:accessGroup];
     keychainItem[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
     keychainItem[(__bridge id)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
     CFDictionaryRef result = nil;
