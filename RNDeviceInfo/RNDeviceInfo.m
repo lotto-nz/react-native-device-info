@@ -130,7 +130,7 @@ RCT_EXPORT_MODULE()
 
 - (NSString*) userAgent
 {
-    return;
+    return @"";
 }
 
 - (NSString*) deviceLocale
