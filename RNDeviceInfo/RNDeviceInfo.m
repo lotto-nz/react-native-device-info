@@ -130,8 +130,7 @@ RCT_EXPORT_MODULE()
 
 - (NSString*) userAgent
 {
-    UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectZero];
-    return [webView stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
+    return;
 }
 
 - (NSString*) deviceLocale
@@ -172,7 +171,7 @@ RCT_EXPORT_MODULE()
              @"appVersion": [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
              @"buildNumber": [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"],
              @"systemManufacturer": @"Apple",
-             @"userAgent": self.userAgent,
+             @"userAgent": self.userAgent ?: [NSNull null],
              @"timezone": self.timezone,
              };
 }
