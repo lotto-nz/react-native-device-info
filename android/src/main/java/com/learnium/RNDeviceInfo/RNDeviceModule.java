@@ -106,7 +106,6 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
     constants.put("uniqueId", getLNZUUID());
     constants.put("systemManufacturer", Build.MANUFACTURER);
     constants.put("bundleId", packageName);
-    constants.put("userAgent", System.getProperty("http.agent"));
     constants.put("timezone", TimeZone.getDefault().getID());
     return constants;
   }

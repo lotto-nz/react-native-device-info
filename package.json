@@ -1,6 +1,6 @@
 {
   "name": "@lotto-nz/react-native-device-info",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Get device information using react-native",
   "main": "deviceinfo.js",
   "repository": {
