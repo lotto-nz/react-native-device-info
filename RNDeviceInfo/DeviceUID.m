@@ -94,7 +94,12 @@ NSString *const LnzDeviceIdKey = @"lnz-uuid";
   }
   // Save for bundle access group
   if (![DeviceUID valueForKeychainKey:LnzDeviceIdKey service:StorageSecureNameSpace accessGroup:bundleAccessGroup]) {
-    [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
+    OSStatus status;
+    status = [DeviceUID setValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
+      // Adding fails try to update as well
+      if (status != noErr) {
+          [DeviceUID updateValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
+      }
   }
   else {
      [DeviceUID updateValue:_uid forKeychainKey:LnzDeviceIdKey inService:StorageSecureNameSpace withAccessGroup:bundleAccessGroup];
